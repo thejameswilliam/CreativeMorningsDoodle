@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>To Be Creative Is To Create – Doodle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <h2>What does <strong>innovation</strong> mean to you?</h2>
+
+    <div id="canvas-wrapper">
+      <canvas id="draw-canvas"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="button-group">
+        <button id="clear-btn" type="button">Restart</button>
+        <button id="submit-btn" type="button">Save Drawing</button>
+      </div>
+      <div id="status"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById("draw-canvas");
+      const wrapper = document.getElementById("canvas-wrapper");
+      const ctx = canvas.getContext("2d");
+      const clearBtn = document.getElementById("clear-btn");
+      const submitBtn = document.getElementById("submit-btn");
+      const statusEl = document.getElementById("status");
+
+      let drawing = false;
+      let lastX = 0;
+      let lastY = 0;
+
+      function resizeCanvas() {
+        const rect = wrapper.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1;
+
+        canvas.width = rect.width * ratio;
+        canvas.height = rect.height * ratio;
+
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "#000000"; // one color
+        ctx.lineWidth = 4;
+      }
+
+      function clearCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        ctx.fillStyle = "#000000";
+      }
+
+      function getCanvasCoords(e) {
+        const rect = canvas.getBoundingClientRect();
+        let clientX, clientY;
+
+        if (e.touches && e.touches.length > 0) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else {
+          clientX = e.clientX;
+          clientY = e.clientY;
+        }
+
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
+      }
+
+      function startDrawing(e) {
+        e.preventDefault();
+        drawing = true;
+        const { x, y } = getCanvasCoords(e);
+        lastX = x;
+        lastY = y;
+      }
+
+      function draw(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getCanvasCoords(e);
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        lastX = x;
+        lastY = y;
+      }
+
+      function stopDrawing(e) {
+        if (!drawing) return;
+        e && e.preventDefault();
+        drawing = false;
+      }
+
+      // Mouse events
+      canvas.addEventListener("mousedown", startDrawing);
+      canvas.addEventListener("mousemove", draw);
+      canvas.addEventListener("mouseup", stopDrawing);
+      canvas.addEventListener("mouseleave", stopDrawing);
+
+      // Touch events
+      canvas.addEventListener("touchstart", startDrawing, { passive: false });
+      canvas.addEventListener("touchmove", draw, { passive: false });
+      canvas.addEventListener("touchend", stopDrawing, { passive: false });
+      canvas.addEventListener("touchcancel", stopDrawing, { passive: false });
+
+      window.addEventListener("resize", resizeCanvas);
+
+      clearBtn.addEventListener("click", () => {
+        clearCanvas();
+      });
+
+      submitBtn.addEventListener("click", async () => {
+        const confirmed = window.confirm("Are you ready to save this drawing?");
+        if (!confirmed) {
+          return;
+        }
+        statusEl.textContent = "Saving...";
+        submitBtn.disabled = true;
+
+        try {
+          const dataURL = canvas.toDataURL("image/png");
+          const res = await fetch("/save-drawing", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ image: dataURL })
+          });
+
+          if (!res.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          const json = await res.json();
+          if (json.ok) {
+            statusEl.textContent = "Saved! Thank you.";
+            clearCanvas();
+            setTimeout(() => {
+              statusEl.textContent = "";
+            }, 3000);
+          } else {
+            throw new Error("Server error");
+          }
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = "Error saving drawing. Please try again.";
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+
+      // Initialize
+      resizeCanvas();
+    })();
+  </script>
+</body>
+</html>
