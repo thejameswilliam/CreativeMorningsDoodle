@@ -8,7 +8,9 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
+  /* Dynamic viewport height for mobile browsers */
   overflow: hidden;
   position: fixed;
   overscroll-behavior: none;
@@ -34,6 +36,8 @@ body {
   flex-direction: column;
   gap: 12px;
   max-height: 100vh;
+  max-height: 100dvh;
+  /* Dynamic viewport height */
 }
 
 h1 {
@@ -137,18 +141,21 @@ button:disabled {
   }
 
   .app {
-    padding: 12px;
+    padding: 8px;
     border-radius: 0;
     max-width: 100%;
     width: 100%;
-    height: 100%;
+    height: 100vh;
+    height: 100dvh;
+    /* Dynamic viewport for Safari */
     box-shadow: none;
-    gap: 10px;
+    gap: 8px;
   }
 
   h2 {
-    font-size: 1.1rem;
-    padding: 0 4px;
+    font-size: 1rem;
+    padding: 0;
+    margin-bottom: 4px;
   }
 
   #canvas-wrapper {
@@ -240,5 +247,29 @@ button:disabled {
 
   50% {
     transform: rotate(90deg);
+  }
+}
+
+/* Safari browser bar hint */
+.safari-hint {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.safari-hint:active {
+  opacity: 0.8;
+}
+
+@media (min-width: 641px) {
+  .safari-hint {
+    display: none;
   }
 }
