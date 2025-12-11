@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: creativemornings-app
+    restart: unless-stopped
+    volumes:
+      # Persist drawings outside the container
+      - ./drawings:/app/drawings
+    networks:
+      - web
+    # No need to expose port externally - Caddy will proxy to it
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: creativemornings-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+    depends_on:
+      - app
+
+networks:
+  web:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
