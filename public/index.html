@@ -43,15 +43,29 @@
         const rect = wrapper.getBoundingClientRect();
         const ratio = window.devicePixelRatio || 1;
 
+        // Save current canvas content
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.putImageData(imageData, 0, 0);
+
+        // Resize canvas
         canvas.width = rect.width * ratio;
         canvas.height = rect.height * ratio;
 
         ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, rect.width, rect.height);
+
+        // Restore canvas content
+        ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width / ratio, tempCanvas.height / ratio);
+
+        // Reset drawing properties
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
-        ctx.strokeStyle = "#000000"; // one color
+        ctx.strokeStyle = "#000000";
         ctx.lineWidth = 4;
       }
 
