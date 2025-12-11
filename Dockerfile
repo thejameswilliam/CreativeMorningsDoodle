@@ -11,17 +11,25 @@ COPY package*.json ./
 RUN npm ci --only=production
 
 # Copy application files
+# Install su-exec for step-down from root
+RUN apk add --no-cache su-exec
+
+# Copy application files
 COPY server.js ./
 COPY public ./public/
+COPY docker-entrypoint.sh /usr/local/bin/
+
+# Make entrypoint executable
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Create drawings directory with proper permissions
 RUN mkdir -p drawings && chown -R node:node /app
 
-# Switch to non-root user for security
-USER node
-
 # Expose the app port
 EXPOSE 8080
+
+# Use entrypoint script to fix permissions and switch user
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Start the application
 CMD ["node", "server.js"]
