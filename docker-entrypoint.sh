@@ -6,6 +6,7 @@ set -e
 if [ -d "/app/drawings" ]; then
     echo "Fixing permissions for /app/drawings..."
     chown -R node:node /app/drawings
+    chmod -R 777 /app/drawings
 fi
 
 # Switch to 'node' user and run the command

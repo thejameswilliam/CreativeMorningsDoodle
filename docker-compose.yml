@@ -28,6 +28,25 @@ services:
     depends_on:
       - app
 
+  ftp:
+    image: fauria/vsftpd
+    container_name: creativemornings-ftp
+    restart: always
+    ports:
+      - "20:20"
+      - "21:21"
+      - "21100-21110:21100-21110"
+    environment:
+      - FTP_USER=cm
+      - FTP_PASS=creativemornings
+      - PASV_ADDRESS=auto
+      - PASV_MIN_PORT=21100
+      - PASV_MAX_PORT=21110
+    volumes:
+      - ./drawings:/home/vsftpd/cm
+    networks:
+      - web
+
 networks:
   web:
     driver: bridge
