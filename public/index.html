@@ -12,21 +12,18 @@
 </head>
 
 <body>
-  <div class="app">
-    <h2>What does <strong>innovation</strong> mean to you?</h2>
+  <h2>What does <strong>innovation</strong> mean to you?</h2>
 
-    <div id="canvas-wrapper">
-      <canvas id="draw-canvas"></canvas>
-    </div>
+  <div id="canvas-wrapper">
+    <canvas id="draw-canvas"></canvas>
+  </div>
 
-    <div class="controls">
-      <div class="button-group">
-        <button id="fullscreen-btn" type="button">Fullscreen</button>
-        <button id="clear-btn" type="button">Restart</button>
-        <button id="submit-btn" type="button">Save Drawing</button>
-      </div>
-      <div id="status"></div>
+  <div class="controls">
+    <div class="button-group">
+      <button id="clear-btn" type="button">Restart</button>
+      <button id="submit-btn" type="button">Save Drawing</button>
     </div>
+    <div id="status"></div>
   </div>
 
   <script>
@@ -36,7 +33,6 @@
       const ctx = canvas.getContext("2d");
       const clearBtn = document.getElementById("clear-btn");
       const submitBtn = document.getElementById("submit-btn");
-      const fullscreenBtn = document.getElementById("fullscreen-btn");
       const statusEl = document.getElementById("status");
 
       let drawing = false;
@@ -172,39 +168,6 @@
 
       // Initialize
       resizeCanvas();
-
-      // Fullscreen toggle with landscape lock
-      fullscreenBtn.addEventListener("click", async () => {
-        try {
-          if (!document.fullscreenElement) {
-            // Enter fullscreen
-            await document.documentElement.requestFullscreen();
-            fullscreenBtn.textContent = "Exit Fullscreen";
-
-            // Lock to landscape orientation (if supported)
-            if (screen.orientation && screen.orientation.lock) {
-              try {
-                await screen.orientation.lock("landscape");
-              } catch (err) {
-                console.log("Orientation lock not supported:", err);
-              }
-            }
-          } else {
-            // Exit fullscreen
-            await document.exitFullscreen();
-            fullscreenBtn.textContent = "Fullscreen";
-          }
-        } catch (err) {
-          console.error("Fullscreen error:", err);
-        }
-      });
-
-      // Update button text when fullscreen changes
-      document.addEventListener("fullscreenchange", () => {
-        if (!document.fullscreenElement) {
-          fullscreenBtn.textContent = "Fullscreen";
-        }
-      });
     })();
   </script>
 </body>
