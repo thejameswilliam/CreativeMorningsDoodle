@@ -39,7 +39,7 @@ services:
     environment:
       - FTP_USER=cm
       - FTP_PASS=creativemornings
-      - PASV_ADDRESS=auto
+      - PASV_ADDRESS=159.65.104.166
       - PASV_MIN_PORT=21100
       - PASV_MAX_PORT=21110
     volumes:
