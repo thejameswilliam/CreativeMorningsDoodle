@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -10,7 +8,6 @@ services:
       - ./drawings:/app/drawings
     networks:
       - web
-    # No need to expose port externally - Caddy will proxy to it
 
   caddy:
     image: caddy:2-alpine
